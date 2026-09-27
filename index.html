@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevShield — Análisis de Riesgo Laboral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F6F0;
+            --card-bg: #FFFFFF;
+            --primary-color: #3D6A8A;
+            --primary-hover: #2D526C;
+            --text-main: #2D3748;
+            --text-muted: #718096;
+            --border-color: #E2E8F0;
+            --badge-admin: #E2D9C8;
+            --risk-high-bg: #FFF5F5;
+            --risk-high-text: #E53E3E;
+            --risk-medium-bg: #FEFCBF;
+            --risk-medium-text: #D69E2E;
+            --risk-low-bg: #F0FFF4;
+            --risk-low-text: #38A169;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 40px; background-color: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .logo-container { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { background-color: #9C6844; color: white; border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; color: #2D3748; }
+        .admin-badge { background-color: var(--badge-admin); color: #6B5B45; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; text-transform: uppercase; }
+
+        .container { max-width: 800px; margin: 20px auto 40px; padding: 0 20px; width: 100%; }
+        .card-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px; }
+
+        .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; font-size: 0.95rem; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background: white; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: #4A5568; font-weight: 500; }
+        .btn-secondary:hover { background: #F7FAFC; }
+        .btn-link { background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: 600; font-size: 0.85rem; text-decoration: underline; }
+
+        .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; }
+        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+
+        .auth-container { max-width: 440px; margin: 40px auto; }
+        .auth-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+        .auth-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4A5568; }
+        .form-group input, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; outline: none; }
+        .form-group input:focus, textarea:focus { border-color: var(--primary-color); }
+
+        .tags-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .tag { padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+        .tag-salario { background: #E2ECF3; color: var(--primary-color); }
+        .tag-contrato { background: #EFE2CE; color: #8C6A2F; }
+        .tag-lenguaje { background: #FDF3D0; color: #9C7A1E; }
+
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 16px; text-align: left; }
+        .admin-table th { background-color: #F7F3EB; padding: 12px 16px; font-size: 0.75rem; font-weight: 700; color: #7A6A58; text-transform: uppercase; }
+        .admin-table td { padding: 14px 16px; border-bottom: 1px solid #EDF2F7; font-size: 0.9rem; }
+        .admin-table td input { width: 100%; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; }
+        .btn-add-role { border: 1px dashed #C4B5A5; background: transparent; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; color: #8C7053; cursor: pointer; margin-top: 16px; font-weight: 500; }
+
+        textarea { height: 140px; resize: vertical; }
+        .dashboard-header { display: flex; align-items: center; gap: 20px; }
+        .score-circle { width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; border: 4px solid currentColor; flex-shrink: 0; }
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 560px) { .grid-2-col { grid-template-columns: 1fr; } }
+        .red-flags-list { list-style: none; margin-top: 12px; }
+        .red-flags-list li { padding: 8px 0; border-bottom: 1px dashed var(--border-color); font-size: 0.85rem; }
+        .salary-box { margin-top: 10px; font-size: 0.85rem; line-height: 1.6; }
+        .bar-track { height: 8px; background: #E9E3D6; border-radius: 6px; position: relative; margin: 14px 0 12px; }
+        .bar-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 6px; background: #C9BFA5; }
+        .bar-marker { position: absolute; top: -4px; width: 3px; height: 16px; border-radius: 2px; background: #9C6844; }
+        .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .salary-tag { display: inline-block; margin-top: 8px; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .recommendation-box { background-color: #FFFDF0; border-color: #F6E05E; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Navegación Superior -->
+    <header class="navbar">
+        <div class="logo-container">
+            <div class="logo-icon">🛡</div>
+            <span class="logo-text">DevShield</span>
+            <span class="admin-badge hidden" id="badge-admin-nav">ADMIN</span>
+        </div>
+        <div>
+            <button class="btn-secondary" id="btn-top-right">Panel administrador</button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- VISTA 1: LOGIN / REGISTRO -->
+        <section id="vista-auth" class="auth-container card-box">
+            <h2 class="auth-title">Bienvenido de nuevo</h2>
+            <p class="auth-sub">Accede para analizar ofertas laborales</p>
+
+            <div class="tabs">
+                <div class="tab active" id="tab-login">Iniciar sesión</div>
+                <div class="tab" id="tab-register">Registrarme</div>
+            </div>
+
+            <form id="form-auth" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="auth-email">Correo electrónico</label>
+                    <input type="email" id="auth-email" placeholder="tucorreo@ejemplo.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Contraseña</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required>
+                </div>
+                <button class="btn-primary" id="btn-submit-auth" type="submit">Iniciar sesión</button>
+            </form>
+        </section>
+
+        <!-- VISTA 2: FORMULARIO DE ANALISIS -->
+        <section id="vista-analisis" class="card-box hidden">
+            <h1 style="font-size: 1.5rem; margin-bottom: 8px;">Analiza la seguridad de tu próxima vacante</h1>
+            <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">Pega el texto completo de la oferta y detecta salarios irreales, exigencias ocultas y riesgos contractuales.</p>
+
+            <div class="tags-row">
+                <span class="tag tag-salario">Salario</span>
+                <span class="tag tag-contrato">Contrato</span>
+                <span class="tag tag-lenguaje">Lenguaje</span>
+            </div>
+
+            <div class="form-group">
+                <label for="texto-oferta">Texto de la oferta</label>
+                <textarea id="texto-oferta" placeholder="Pega aquí el texto completo de la oferta laboral..."></textarea>
+            </div>
+
+            <button class="btn-primary" id="btn-analizar">Analizar oferta</button>
+        </section>
+
+        <!-- VISTA 3: DASHBOARD RESULTADOS -->
+        <section id="vista-resultados" class="hidden">
+            <div class="dashboard-header card-box" id="banner-riesgo">
+                <div class="score-circle" id="score-circle">
+                    <span id="score-porcentaje">0%</span>
+                </div>
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #718096; letter-spacing: 0.5px;">NIVEL DE RIESGO</span>
+                    <h2 id="titulo-riesgo" style="font-size: 1.3rem; margin: 2px 0;">Evaluando...</h2>
+                    <p id="desc-riesgo" style="font-size: 0.85rem; color: #4A5568;">Se detectaron señales de alerta en esta oferta laboral.</p>
+                </div>
+            </div>
+
+            <div class="grid-2-col">
+                <div class="card-box">
+                    <h3 style="font-size: 1rem;">🚩 Banderas rojas detectadas</h3>
+                    <ul class="red-flags-list" id="lista-banderas"></ul>
+                </div>
+
+                <div class="card-box">
+                    <h3 style="font-size: 1rem;">💵 Salario vs. Mercado</h3>
+                    <div class="bar-track"><div class="bar-fill" id="barFill"></div><div class="bar-marker" id="barMarker"></div></div>
+                    <div class="salary-box">
+                        <p><span class="legend-dot" style="background:#9C6844;"></span><strong>Tu oferta:</strong> <span id="oferta-salario">No especificado</span></p>
+                        <p><span class="legend-dot" style="background:#3D6A8A;"></span><strong>Mercado junior:</strong> <span id="mercado-rango">—</span></p>
+                        <span class="salary-tag" id="tag-salario">En evaluación</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-box recommendation-box">
+                <h3 style="font-size: 1rem;">💡 Recomendación</h3>
+                <p id="texto-recomendacion" style="font-size: 0.9rem; margin-top: 6px;">Analizando condiciones...</p>
+                <div style="margin-top: 12px;">
+                    <button class="btn-secondary" id="btn-copiar-preguntas">📋 Copiar preguntas sugeridas para el reclutador</button>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="btn-reanalizar">Analizar otra vacante</button>
+        </section>
+
+        <!-- VISTA 4: PANEL DE ADMINISTRADOR -->
+        <section id="vista-admin" class="hidden">
+            <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 16px;">Gestión de parámetros del sistema</h2>
+
+            <div class="tabs">
+                <div class="tab active">Rangos salariales</div>
+                <div class="tab">Palabras clave</div>
+            </div>
+
+            <div class="card-box" style="padding: 16px;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ROL TI</th>
+                            <th>SALARIO MÍNIMO</th>
+                            <th>SALARIO MÁXIMO</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tbody"></tbody>
+                </table>
+
+                <button class="btn-add-role" id="btn-add-role">+ Agregar rol</button>
+            </div>
+
+            <div style="text-align: right; margin-top: 16px;">
+                <button class="btn-primary" style="width: auto; padding: 12px 32px;" id="btn-guardar-admin">Guardar cambios</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
